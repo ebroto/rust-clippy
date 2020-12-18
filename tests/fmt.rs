@@ -1,3 +1,4 @@
+use std::io::Write;
 use std::path::PathBuf;
 use std::process::Command;
 
@@ -12,6 +13,8 @@ fn fmt() {
         .args(&["component", "list", "--toolchain", "nightly"])
         .output()
         .unwrap();
+    std::io::stdout().write_all(&rustup_output.stdout).unwrap();
+    std::io::stderr().write_all(&rustup_output.stderr).unwrap();
     assert!(rustup_output.status.success());
     let component_output = String::from_utf8_lossy(&rustup_output.stdout);
     if !component_output.contains("rustfmt") {
@@ -29,6 +32,9 @@ fn fmt() {
     println!("stdout: {}", String::from_utf8_lossy(&output.stdout));
     println!("stderr: {}", String::from_utf8_lossy(&output.stderr));
 
+    std::io::stdout().write_all(&output.stdout).unwrap();
+    std::io::stderr().write_all(&output.stderr).unwrap();
+    assert!(rustup_output.status.success());
     assert!(
         output.status.success(),
         "Formatting check failed. Run `cargo dev fmt` to update formatting."
